@@ -1,104 +1,97 @@
-// @TODO: YOUR CODE HERE!
-// Define SVG parameter & margine.
+// SVG parameter
+// var svgHeight = window.innerHeight;
+// var svgWidth = window.innerWidth;
+var svgWidth = 960;
+var svgHeight = 500;
 
-function makeResponsive() {
-    // if the SVG area isn't empty when the browser loads,
-    // remove it and replace it with a resized version of the chart
-  var svgArea = d3.select("body").select("svg");
-  if (!svgArea.empty()) {
-    svgArea.remove();
-  }
-    // svg params
-    // var svgHeight = window.innerHeight;
-    // var svgWidth = window.innerWidth;
-    var svgWidth = 960;
-    var svgHeight = 500;
-
-    var margin = {
+var margin = {
     top: 20,
     right: 40,
-    bottom: 80,
-    left: 100
-    };
+    bottom: 120,
+    left: 120
+};
 
-    // Define chart parameter
-    var chartHeight = svgHeight - margin.top - margin.bottom;
-    var chartWidth = svgWidth - margin.left - margin.right;
+// Define chart parameter
+var chartHeight = svgHeight - margin.top - margin.bottom;
+var chartWidth = svgWidth - margin.left - margin.right;
 
+// Get Scales
+getScale=(axis, data, chosenAxis)=>{
+    var min = d3.min(data, d => d[chosenAxis]);
+    var max = d3.max(data, d => d[chosenAxis]);
+    var buffer = (max-min)/20;
+
+    var LinearScale = d3.scaleLinear()
+        .domain([min-buffer, max+buffer])
+        .range([axis === "x" ? 0 : chartHeight, axis === "x" ? chartWidth : 0]);
+    
+    return LinearScale;
+}   
+
+makeResponsive=()=>{
+    console.log("In function MakeResponsive");
+
+    var svgArea = d3.select("body").select("svg");
+    if (!svgArea.empty()) {
+        svgArea.remove();
+    }
+
+    // var svgHeight = window.innerHeight;
+    // var svgWidth = window.innerWidth;
+
+    chartHeight = svgHeight - margin.top - margin.bottom;
+    chartWidth = svgWidth - margin.left - margin.right;
+    
     var svg = d3.select("#scatter")
         .append("svg")
+        .attr("style", "outline: thin solid lightgrey;")
         .attr("height", svgHeight)
         .attr("width", svgWidth);
-
+    
     var chartGroup = svg.append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    
+    d3.csv("assets/data/data.csv").then(function(stateData, err){
+        if(err) throw err;
 
-    //Import Data
-    d3.csv("assets/data/data.csv").then(function(stateData){
-        
-        // parse data
+        // Initial Params
+        var chosenXAxis = "poverty";
+        var chosenYAxis = "healthcare";
+
+        // Parse Data
         stateData.forEach(data => {
-            data.poverty = +data.poverty;
-            data.healthcare = +data.healthcare;
+            data.poverty=+data.poverty;
+            data.age=+data.age;
+            data.income=+data.income;
+            data.healthcare=+data.healthcare;
+            data.obesity=+data.obesity;
+            data.smokes=+data.smokes;
         });
 
-        // Create scales
-        var xScale = d3.scaleLinear()
-            .domain([d3.min(stateData, d => d.poverty) - 0.5, d3.max(stateData, d => d.poverty) + 0.5])
-            .range([0, chartWidth]);
-        
-        var yScale = d3.scaleLinear()
-            .domain(d3.extent(stateData, d => d.healthcare))
-            .range([chartHeight, 0]);
-        
-        // Create Axis functions
-        var xAxis = d3.axisBottom(xScale);
-        var yAxis = d3.axisLeft(yScale);
+        // call getScale function to get the Linear scale for X Axis
+        var xLinearScale = getScale("x", stateData, chosenXAxis);
 
-        // Append Axis on chart
-        chartGroup.append("g")
-            .attr("transform", `translate(0,${chartHeight})`)
-            .call(xAxis);
-        
-        chartGroup.append("g")
-            .call(yAxis);
-        
-        var circlesGroup = chartGroup.selectAll("g")
-            .data(stateData)
-            .enter()
-            .append("g");
+        // call getScale function to get the Linear scale for Y Axis
+        var yLinearScale = getScale("y", stateData, chosenYAxis);
 
-        var circles = circlesGroup.append("circle")
-            .classed("stateCircle", true)
-            .attr("cx", d => xScale(d.poverty))
-            .attr("cy", d => yScale(d.healthcare))
-            .attr("r", 15);
-        
-        // create text of circle group
-        var circleText = circlesGroup.append("text")
-            .classed("stateText", true)
-            .text(d => d.abbr)
-            .attr("x", d => xScale(d.poverty))
-            .attr("y", d => yScale(d.healthcare)+6);
+        // Create initial axis function
+        var bottomAxis = d3.axisBottom(xLinearScale);
+        var leftAxis = d3.axisLeft(yLinearScale);
 
-        // Create axes labels
-        chartGroup.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 0 - margin.left + 40)
-            .attr("x", 0 - (chartHeight / 2))
-            .attr("dy", "1em")
-            .attr("class", "active aText")
-            .text("healthcare(%)");
-    
-        chartGroup.append("text")
-            .attr("transform", `translate(${chartWidth / 2}, ${chartHeight + margin.top + 30})`)
-            .attr("class", "active aText")
-            .text("In Poverty(%)");
-            
+        // Apend axis
+        var xAxis = chartGroup.append("g")
+            .attr("transform",`translate(0, ${chartHeight})`)
+            .call(bottomAxis);
+        
+        var yAxis = chartGroup.append("g")
+            .call(leftAxis)
+        
+
     }).catch(function(error){
         console.log(error);
     });
 }
+
 
 makeResponsive();
 // Event listener for window resize.
