@@ -134,13 +134,24 @@ makeResponsive=()=>{
             .attr("y", 0 - margin.left + 20)
             .attr("value", "obesity")
             .classed("inactive aText", true)
-            .text("Obese (%)");        
+            .text("Obese (%)");
+
+        // Create circle group which will contain circles & text.
+        var circlesGroup = chartGroup.append("g").selectAll("g")
+            .data(stateData)
+            .enter()
+            .append("g");
+        
+        circlesGroup.append("circle")
+            .classed("stateCircle", true)
+            .attr("cx", d => xLinearScale(d[chosenXAxis]))
+            .attr("cy", d => yLinearScale(d[chosenYAxis]))
+            .attr("r", 15);
 
     }).catch(function(error){
         console.log(error);
     });
 }
-
 
 makeResponsive();
 // Event listener for window resize.
