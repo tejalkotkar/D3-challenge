@@ -28,6 +28,17 @@ getScale=(axis, data, chosenAxis)=>{
     return LinearScale;
 }   
 
+// Render Axes
+renderAxis=(axis, newScale, newAxis)=>{
+
+    var axisPos = (axis === "x") ? d3.axisBottom(newScale) : d3.axisLeft(newScale)
+    newAxis.transition()
+        .duration(1000)
+        .call(axisPos);
+
+    return newAxis;
+}
+
 // UpdateToolTip
 updateToolTip=(chosenXAxis, chosenYAxis, circlesGroup)=>{
     var label1;
@@ -212,6 +223,91 @@ makeResponsive=()=>{
             .text(d => d.abbr);
         
         updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+
+        // x-Axis labels event listener
+        xLabelGroup.selectAll("text").on("click", function(){
+            var currentAxis = "x"
+            var selected_X_Axis = d3.select(this).attr("value");
+
+            if(selected_X_Axis != chosenXAxis){
+                chosenXAxis = selected_X_Axis;
+
+                // Update x-Scale for new data
+                newXLinearScale = getScale(currentAxis, stateData, chosenXAxis);
+
+                // Update x-Axis with transitions
+                xAxis = renderAxis(currentAxis, newXLinearScale, xAxis)
+
+                // Render Circles + text
+                
+
+                // Update Tooltip
+                //updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+
+                // Update label formatting
+                switch(chosenXAxis){
+                    case "poverty" :
+                        povertyLabel.classed("active aText", true).classed("inactive", false);
+                        ageLabel.classed("inactive aText", true).classed("active", false);
+                        incomeLabel.classed("inactive aText", true).classed("active", false);
+                        break;
+
+                    case "age" :
+                        ageLabel.classed("active aText", true).classed("inactive", false);
+                        incomeLabel.classed("inactive aText", true).classed("active", false);
+                        povertyLabel.classed("inactive aText", true).classed("active", false);
+                        break;
+
+                    case "income" :
+                        incomeLabel.classed("active aText", true).classed("inactive", false);
+                        povertyLabel.classed("inactive aText", true).classed("active", false);
+                        ageLabel.classed("inactive aText", true).classed("active", false);
+                        break;
+                }
+            }
+        });
+
+        // Y-axis labels event listener
+        yLabelGroup.selectAll("text").on("click", function(){
+            currentAxis = "y";
+            var selected_Y_Axis = d3.select(this).attr("value");
+            if(selected_Y_Axis != chosenYAxis){
+                chosenYAxis = selected_Y_Axis;
+
+                // update y-scale for new data
+                newYLinearScale = getScale(currentAxis, stateData, chosenYAxis);
+
+                // update y-Axis with transtitions
+                yAxis = renderAxis(currentAxis, newYLinearScale, yAxis);
+
+                // Render Circles + text
+                
+
+                // Update Tooltip
+                //updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+                
+                // Update label formatting
+                switch(chosenYAxis){
+                    case "healthcare":
+                        healthcareLabel.classed("active aText", true).classed("inactive", false);
+                        smokesLabel.classed("inactive aText", true).classed("active", false);
+                        obeseLabel.classed("inactive aText", true).classed("active", false);
+                        break;
+
+                    case "smokes":
+                        smokesLabel.classed("active aText", true).classed("inactive", false);                    
+                        healthcareLabel.classed("inactive aText", true).classed("active", false);    
+                        obeseLabel.classed("inactive aText", true).classed("active", false);
+                        break;
+
+                    case "obesity":
+                        obeseLabel.classed("active aText", true).classed("inactive", false);
+                        healthcareLabel.classed("inactive aText", true).classed("active", false);
+                        smokesLabel.classed("inactive aText", true).classed("active", false);
+                        break;
+                }
+            }
+        });        
 
     }).catch(function(error){
         console.log(error);
