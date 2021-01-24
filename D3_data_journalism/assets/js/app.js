@@ -28,6 +28,63 @@ getScale=(axis, data, chosenAxis)=>{
     return LinearScale;
 }   
 
+// UpdateToolTip
+updateToolTip=(chosenXAxis, chosenYAxis, circlesGroup)=>{
+    var label1;
+    var label2;
+    var isPercentageX = false;
+    var isPercentageY = false;
+
+    switch(chosenXAxis){
+        case "age":
+            label1 = "Age";
+            break;
+
+        case "poverty":
+            label1 = "Poverty";
+            isPercentageX = true;
+            break;
+
+        case "income":
+            label1 = "Income";
+            break;
+    }
+
+    switch(chosenYAxis){
+        case "healthcare":
+            label2 = "Healthcare";
+            isPercentageY = true;
+            break;
+
+        case "smokes":
+            label2 = "Smokes";
+            isPercentageY = true;
+            break;
+
+        case "obesity":
+            label2 = "Obesity";
+            isPercentageY = true;
+            break;
+    }
+
+    var toolTip = d3.tip()
+        .attr("class","d3-tip")
+        .offset([80, -60])
+        .html(function(d){
+            return (`${d['state']}</br>${label1} : ${d[chosenXAxis]}${isPercentageX ? "%" : ""}</br>${label2} : ${d[chosenYAxis]}${isPercentageY ? "%" : ""}`)
+        });
+    
+    circlesGroup.call(toolTip);
+
+    circlesGroup.on("mouseover", function(data){
+        toolTip.show(data);
+    }).on("mouseout",function(data){
+        toolTip.hide(data);
+    });
+    
+    return circlesGroup;
+}
+
 makeResponsive=()=>{
     console.log("In function MakeResponsive");
 
@@ -147,6 +204,14 @@ makeResponsive=()=>{
             .attr("cx", d => xLinearScale(d[chosenXAxis]))
             .attr("cy", d => yLinearScale(d[chosenYAxis]))
             .attr("r", 15);
+
+        circlesGroup.append("text")
+            .classed("stateText", true)
+            .attr("x", d => xLinearScale(d[chosenXAxis]))
+            .attr("y", d => yLinearScale(d[chosenYAxis])+6)
+            .text(d => d.abbr);
+        
+        updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
     }).catch(function(error){
         console.log(error);
