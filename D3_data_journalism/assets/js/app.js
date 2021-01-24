@@ -86,6 +86,55 @@ makeResponsive=()=>{
         var yAxis = chartGroup.append("g")
             .call(leftAxis)
         
+        // Create group for x-Axis labels
+        var xLabelGroup = chartGroup.append("g")
+            .attr("transform",`translate(${chartWidth/2}, ${chartHeight+margin.top})`);
+
+        const povertyLabel = xLabelGroup.append("text")
+            .attr("x", 0)
+            .attr("y", 20)
+            .attr("value", "poverty")
+            .classed("active aText", true)
+            .text("In Poverty (%)");
+
+        const ageLabel = xLabelGroup.append("text")
+            .attr("x", 0)
+            .attr("y", 50)
+            .attr("value", "age")
+            .classed("inactive aText", true)
+            .text("Age (Median)");
+
+        const incomeLabel = xLabelGroup.append("text")
+            .attr("x", 0)
+            .attr("y", 80)
+            .attr("value", "income")
+            .classed("inactive aText", true)
+            .text("Household Income (Median)"); 
+    
+        // Create group for y-Axis labels
+        var yLabelGroup = chartGroup.append("g")
+            .attr("transform","rotate(-90)");
+    
+        const healthcareLabel = yLabelGroup.append("text")
+            .attr("x", 0 - (chartHeight / 2))
+            .attr("y", 0 - margin.left + 80)
+            .attr("value", "healthcare")
+            .classed("active aText", true)
+            .text("Lacks Healthcare (%)");
+
+        const smokesLabel = yLabelGroup.append("text")
+            .attr("x", 0 - (chartHeight / 2))
+            .attr("y", 0 - margin.left + 50)
+            .attr("value", "smokes")
+            .classed("inactive aText", true)
+            .text("Smokes (%)");
+        
+        const obeseLabel = yLabelGroup.append("text")
+            .attr("x", 0 - (chartHeight / 2))
+            .attr("y", 0 - margin.left + 20)
+            .attr("value", "obesity")
+            .classed("inactive aText", true)
+            .text("Obese (%)");        
 
     }).catch(function(error){
         console.log(error);
