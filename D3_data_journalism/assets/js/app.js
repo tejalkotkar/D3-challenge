@@ -1,22 +1,5 @@
-// SVG parameter
-// var svgHeight = window.innerHeight;
-// var svgWidth = window.innerWidth;
-var svgWidth = 960;
-var svgHeight = 500;
-
-var margin = {
-    top: 20,
-    right: 40,
-    bottom: 120,
-    left: 120
-};
-
-// Define chart parameter
-var chartHeight = svgHeight - margin.top - margin.bottom;
-var chartWidth = svgWidth - margin.left - margin.right;
-
 // Get Scales
-getScale=(axis, data, chosenAxis)=>{
+getScale=(axis, data, chosenAxis, chartHeight, chartWidth)=>{
     var min = d3.min(data, d => d[chosenAxis]);
     var max = d3.max(data, d => d[chosenAxis]);
     var buffer = (max-min)/20;
@@ -37,6 +20,19 @@ renderAxis=(axis, newScale, newAxis)=>{
         .call(axisPos);
 
     return newAxis;
+}
+
+// Render Circles & Text
+renderCircles=(axis, circlesGroup, newScale, newChosenAxis)=>{
+    circlesGroup.selectAll("circle")
+        .transition()
+        .duration(1000)
+        .attr(axis === "x" ? "cx" : "cy", d => newScale(d[newChosenAxis]));
+    
+    circlesGroup.selectAll("text")
+        .transition()
+        .duration(1000)
+        .attr(axis === "x" ? "x" : "y", axis === "x" ? d => newScale(d[newChosenAxis]) : d => newScale(d[newChosenAxis])+6);
 }
 
 // UpdateToolTip
@@ -104,11 +100,20 @@ makeResponsive=()=>{
         svgArea.remove();
     }
 
-    // var svgHeight = window.innerHeight;
-    // var svgWidth = window.innerWidth;
+    // SVG parameter
+    var svgHeight = window.innerHeight;
+    var svgWidth = window.innerWidth;
 
-    chartHeight = svgHeight - margin.top - margin.bottom;
-    chartWidth = svgWidth - margin.left - margin.right;
+    var margin = {
+        top: 20,
+        right: 40,
+        bottom: 120,
+        left: 120
+    };
+
+    // Define chart parameter
+    var chartHeight = svgHeight - margin.top - margin.bottom;
+    var chartWidth = svgWidth - margin.left - margin.right;
     
     var svg = d3.select("#scatter")
         .append("svg")
@@ -137,10 +142,10 @@ makeResponsive=()=>{
         });
 
         // call getScale function to get the Linear scale for X Axis
-        var xLinearScale = getScale("x", stateData, chosenXAxis);
+        var xLinearScale = getScale("x", stateData, chosenXAxis, chartHeight, chartWidth);
 
         // call getScale function to get the Linear scale for Y Axis
-        var yLinearScale = getScale("y", stateData, chosenYAxis);
+        var yLinearScale = getScale("y", stateData, chosenYAxis, chartHeight, chartWidth);
 
         // Create initial axis function
         var bottomAxis = d3.axisBottom(xLinearScale);
@@ -233,16 +238,16 @@ makeResponsive=()=>{
                 chosenXAxis = selected_X_Axis;
 
                 // Update x-Scale for new data
-                newXLinearScale = getScale(currentAxis, stateData, chosenXAxis);
+                newXLinearScale = getScale(currentAxis, stateData, chosenXAxis, chartHeight, chartWidth);
 
                 // Update x-Axis with transitions
                 xAxis = renderAxis(currentAxis, newXLinearScale, xAxis)
 
                 // Render Circles + text
-                
+                renderCircles(currentAxis, circlesGroup, newXLinearScale, chosenXAxis);
 
                 // Update Tooltip
-                //updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+                updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
                 // Update label formatting
                 switch(chosenXAxis){
@@ -275,16 +280,16 @@ makeResponsive=()=>{
                 chosenYAxis = selected_Y_Axis;
 
                 // update y-scale for new data
-                newYLinearScale = getScale(currentAxis, stateData, chosenYAxis);
+                newYLinearScale = getScale(currentAxis, stateData, chosenYAxis, chartHeight, chartWidth);
 
                 // update y-Axis with transtitions
                 yAxis = renderAxis(currentAxis, newYLinearScale, yAxis);
 
                 // Render Circles + text
-                
+                renderCircles(currentAxis, circlesGroup, newYLinearScale, chosenYAxis);
 
                 // Update Tooltip
-                //updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+                updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
                 
                 // Update label formatting
                 switch(chosenYAxis){
@@ -314,8 +319,9 @@ makeResponsive=()=>{
     });
 }
 
+// Initial call for displaying application when page is loaded.
 makeResponsive();
+
 // Event listener for window resize.
 // When the browser window is resized, makeResponsive() is called.
-
 d3.select(window).on("resize", makeResponsive);
