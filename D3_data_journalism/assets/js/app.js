@@ -1,4 +1,7 @@
-// Get Scales
+/* Get Scales
+ * function to get the scales for axis according to data.
+ */
+
 getScale=(axis, data, chosenAxis, chartHeight, chartWidth)=>{
     var min = d3.min(data, d => d[chosenAxis]);
     var max = d3.max(data, d => d[chosenAxis]);
@@ -11,7 +14,9 @@ getScale=(axis, data, chosenAxis, chartHeight, chartWidth)=>{
     return LinearScale;
 }   
 
-// Render Axes
+/* Render Axes 
+ * function to transtition axis values to new values
+ */
 renderAxis=(axis, newScale, newAxis)=>{
 
     var axisPos = (axis === "x") ? d3.axisBottom(newScale) : d3.axisLeft(newScale)
@@ -22,7 +27,9 @@ renderAxis=(axis, newScale, newAxis)=>{
     return newAxis;
 }
 
-// Render Circles & Text
+/* Render Circles & Text
+ * function to transtition circles and circle text
+*/
 renderCircles=(axis, circlesGroup, newScale, newChosenAxis)=>{
     circlesGroup.selectAll("circle")
         .transition()
@@ -35,13 +42,16 @@ renderCircles=(axis, circlesGroup, newScale, newChosenAxis)=>{
         .attr(axis === "x" ? "x" : "y", axis === "x" ? d => newScale(d[newChosenAxis]) : d => newScale(d[newChosenAxis])+6);
 }
 
-// UpdateToolTip
+/* UpdateToolTip
+* function to create and display tooltip.
+*/
 updateToolTip=(chosenXAxis, chosenYAxis, circlesGroup)=>{
     var label1;
     var label2;
     var isPercentageX = false;
     var isPercentageY = false;
 
+    // Create a lebel according to the axis label selected for X axis
     switch(chosenXAxis){
         case "age":
             label1 = "Age";
@@ -57,6 +67,7 @@ updateToolTip=(chosenXAxis, chosenYAxis, circlesGroup)=>{
             break;
     }
 
+    // Create a lebel according to the axis label selected for Y axis
     switch(chosenYAxis){
         case "healthcare":
             label2 = "Healthcare";
@@ -74,6 +85,7 @@ updateToolTip=(chosenXAxis, chosenYAxis, circlesGroup)=>{
             break;
     }
 
+    // Create Tooltip
     var toolTip = d3.tip()
         .attr("class","d3-tip")
         .offset([80, -60])
@@ -81,8 +93,10 @@ updateToolTip=(chosenXAxis, chosenYAxis, circlesGroup)=>{
             return (`${d['state']}</br>${label1} : ${d[chosenXAxis]}${isPercentageX ? "%" : ""}</br>${label2} : ${d[chosenYAxis]}${isPercentageY ? "%" : ""}`)
         });
     
+    // call tooltip on circlesGroup        
     circlesGroup.call(toolTip);
-
+    
+    // mouseover & mouseout events to show and hide toolip respectively.
     circlesGroup.on("mouseover", function(data){
         toolTip.show(data);
     }).on("mouseout",function(data){
@@ -92,6 +106,7 @@ updateToolTip=(chosenXAxis, chosenYAxis, circlesGroup)=>{
     return circlesGroup;
 }
 
+// Function which gets triggerd when browser window is resized
 makeResponsive=()=>{
     console.log("In function MakeResponsive");
 
@@ -114,16 +129,19 @@ makeResponsive=()=>{
     // Define chart parameter
     var chartHeight = svgHeight - margin.top - margin.bottom;
     var chartWidth = svgWidth - margin.left - margin.right;
-    
+
+    // Create svg area
     var svg = d3.select("#scatter")
         .append("svg")
         .attr("style", "outline: thin solid lightgrey;")
         .attr("height", svgHeight)
         .attr("width", svgWidth);
     
+    // Creating a chartGroup
     var chartGroup = svg.append("g")
         .attr("transform", `translate(${margin.left}, ${margin.top})`);
     
+    // Import csv and read it
     d3.csv("assets/data/data.csv").then(function(stateData, err){
         if(err) throw err;
 
