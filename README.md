@@ -24,7 +24,7 @@ The final application can be reached at [https://tejalkotkar.github.io/D3-challe
 
 ### Application Default view: 
 When application ia launched by default view displays Healthcare Vs Poverty. Both axes appears with 3 lables where Healthcare & Poverty shows as active.You can choose any inactive label to display its data. 
-![Default View](Images/Default_view)
+![Default View](Images/Default_view.PNG)
 
 #### Steps:
 Project includes below steps -
@@ -60,7 +60,7 @@ Project includes below steps -
 	c) Circle & circle text are transitioned to new positions according to new data.
 
 	d) Tool tips are updated.
-    
+
 	e) Class of selected label becomes active and class of other becomes inacive.
 	
 
