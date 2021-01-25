@@ -52,10 +52,15 @@ Project includes below steps -
 7) Changing Axes & Transitions -
 	On click event is added for both axes. When different label is selected from any axis on click event is triggerd.
 	Below are the steps added for on click event:
+
 	a) New scale is calculated for the selected data
+
 	b) Axis values are transitioned to new value
+
 	c) Circle & circle text are transitioned to new positions according to new data
+
 	d) Tool tips are updated
+    
 	e) Class of selected label becomes active and class of other becomes inacive.
 	
 
