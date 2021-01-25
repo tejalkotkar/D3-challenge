@@ -2,7 +2,7 @@
 In this project, I built an interactive scatterplot to explore the relationships between aggregated census data by state.
 
 Project is deployed at :
-[**Website Link**] : [https://tejalkotkar.github.io/D3-challenge/D3_data_journalism/] (https://tejalkotkar.github.io/D3-challenge/D3_data_journalism/)
+[**Website Link**] : [https://tejalkotkar.github.io/D3-challenge/D3_data_journalism/](https://tejalkotkar.github.io/D3-challenge/D3_data_journalism/)
 
 
 #### Tools:
